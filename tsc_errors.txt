@@ -1,0 +1,23 @@
+﻿app/api/ai/insights/route.ts(83,69): error TS2571: Object is of type 'unknown'.
+app/dashboard/page.tsx(199,21): error TS2322: Type '(value: number, name: string) => [string, string]' is not assignable to type 'Formatter<ValueType, NameType> & ((value: ValueType, name: NameType, item: TooltipPayloadEntry, index: number, payload: TooltipPayload) => ReactNode | [...])'.
+  Type '(value: number, name: string) => [string, string]' is not assignable to type 'Formatter<ValueType, NameType>'.
+    Types of parameters 'value' and 'value' are incompatible.
+      Type 'ValueType | undefined' is not assignable to type 'number'.
+        Type 'undefined' is not assignable to type 'number'.
+components/AppLayout.tsx(36,64): error TS2339: Property 'plan' does not exist on type '{ id: string; email: string; full_name: string | null; avatar_url: string | null; currency: string; updated_at: string; }'.
+components/AppLayout.tsx(36,82): error TS2339: Property 'plan' does not exist on type '{ id: string; email: string; full_name: string | null; avatar_url: string | null; currency: string; updated_at: string; }'.
+hooks/useBudgets.ts(38,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "budgets", never, "POST">', gave the following error.
+    Argument of type '{ user_id: string; category: string; limit_amount: number; }[]' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "budgets", never, "POST">', gave the following error.
+    Type '{ user_id: string; category: string; limit_amount: number; }' is not assignable to type 'never'.
+hooks/useBudgets.ts(51,17): error TS2345: Argument of type '{ category?: string | undefined; limit_amount?: number | undefined; }' is not assignable to parameter of type 'never'.
+hooks/useNotifications.ts(36,17): error TS2345: Argument of type '{ is_read: boolean; }' is not assignable to parameter of type 'never'.
+hooks/useNotifications.ts(53,17): error TS2345: Argument of type '{ is_read: boolean; }' is not assignable to parameter of type 'never'.
+hooks/useProfile.ts(46,17): error TS2345: Argument of type '{ id?: string | undefined; email?: string | undefined; full_name?: string | null | undefined; avatar_url?: string | null | undefined; currency?: string | undefined; updated_at?: string | undefined; }' is not assignable to parameter of type 'never'.
+hooks/useTransactions.ts(46,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+    Argument of type 'any[]' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "transactions", never, "POST">', gave the following error.
+    Type 'any' is not assignable to type 'never'.
+hooks/useTransactions.ts(75,17): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
