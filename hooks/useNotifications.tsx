@@ -65,11 +65,13 @@ export function useNotifications() {
         // 3. Fetch History (Defensive) to prevent double-sending
         let sentTitles = new Set<string>();
         try {
-          const { data: historyData } = await supabase
+          const response = await supabase
             .from('notification_history')
             .select('title')
             .eq('user_id', userId);
-          sentTitles = new Set(historyData?.map((h) => h.title) || []);
+            
+          const historyData = response.data as { title: string }[] | null;
+          sentTitles = new Set(historyData?.map((h: { title: string }) => h.title) || []);
         } catch (e) {
           console.warn('Notification history table might be missing:', e);
         }
@@ -87,7 +89,7 @@ export function useNotifications() {
              // Only proceed if the AI-generated title is new
              if (aiData.title && !sentTitles.has(aiData.title)) {
                 // 5. Insert valid Notification record
-                const { data: newNotif, error: insError } = await (supabase as any)
+                const { data: newNotif, error: insError } = await supabase
                   .from('notifications')
                   .insert({
                     user_id: userId,
@@ -100,7 +102,7 @@ export function useNotifications() {
 
                 if (!insError && newNotif) {
                   // 6. Record in persistent history for future deduplication
-                  await (supabase as any).from('notification_history').insert({
+                  await supabase.from('notification_history').insert({
                     user_id: userId,
                     title: aiData.title,
                     category: signal.type
@@ -145,8 +147,8 @@ export function useNotifications() {
       }
     }
 
-    const { data: transactions } = await (supabase as any).from('transactions').select('*').eq('user_id', user.id);
-    const { data: budgets } = await (supabase as any).from('budgets').select('*').eq('user_id', user.id);
+    const { data: transactions } = await supabase.from('transactions').select('*').eq('user_id', user.id);
+    const { data: budgets } = await supabase.from('budgets').select('*').eq('user_id', user.id);
     
     if (transactions && budgets) {
       await generateProactiveNotifications(transactions, budgets, user.id);
@@ -223,7 +225,7 @@ export function useNotifications() {
     try {
       if (!user) return;
       setLoading(true);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
@@ -241,7 +243,7 @@ export function useNotifications() {
 
   const markAsRead = async (id: string) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
         .eq('id', id);
@@ -257,7 +259,7 @@ export function useNotifications() {
     try {
       if (!user) return;
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
         .eq('user_id', user.id)
@@ -274,7 +276,7 @@ export function useNotifications() {
     try {
       if (!user) return;
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('notifications')
         .update({ is_dismissed: true })
         .eq('user_id', user.id);
@@ -293,7 +295,7 @@ export function useNotifications() {
     fetchNotifications();
 
     // Subscribe to REALTIME notification changes
-    const channel = (supabase as any)
+    const channel = supabase
       .channel('public:notifications')
       .on(
         'postgres_changes',

@@ -13,7 +13,7 @@ export function useBudgets() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient() as any;
+  const supabase = createClient();
   const { user, loading: authLoading } = useAuth();
   const { checkProactive } = useNotifications();
 

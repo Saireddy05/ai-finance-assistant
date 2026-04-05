@@ -15,7 +15,7 @@ export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient() as any;
+  const supabase = createClient();
   const { user, loading: authLoading } = useAuth();
   const { checkProactive } = useNotifications();
 
@@ -69,7 +69,7 @@ export function useTransactions() {
 
   const deleteTransaction = async (id: string) => {
     try {
-      const { error: deleteError } = await (supabase as any)
+      const { error: deleteError } = await supabase
         .from('transactions')
         .delete()
         .eq('id', id);
@@ -84,7 +84,7 @@ export function useTransactions() {
 
   const updateTransaction = async (id: string, updates: Partial<Omit<Database['public']['Tables']['transactions']['Update'], 'user_id' | 'id'>>) => {
     try {
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('transactions')
         .update(updates)
         .eq('id', id);

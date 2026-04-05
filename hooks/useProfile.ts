@@ -12,7 +12,7 @@ export function useProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient() as any;
+  const supabase = createClient();
   const { user, loading: authLoading } = useAuth();
 
   const fetchProfile = async () => {
@@ -24,7 +24,7 @@ export function useProfile() {
 
     try {
       setLoading(true);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
@@ -44,7 +44,7 @@ export function useProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('profiles')
         .update(updates)
         .eq('id', user.id);

@@ -14,7 +14,7 @@ export function useChat() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient() as any;
+  const supabase = createClient();
   const { user, loading: authLoading } = useAuth();
 
   // Initialize a new chat on mount if not provided
@@ -34,8 +34,8 @@ export function useChat() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      const conversationsData = (data as any[]) || [];
-      setConversations(conversationsData.map(c => ({
+      const conversationsData = data || [];
+      setConversations(conversationsData.map((c: any) => ({
         id: c.id,
         label: c.title
       })));
@@ -81,7 +81,7 @@ export function useChat() {
       role: 'user',
       content,
       created_at: new Date().toISOString()
-    } as any;
+    } as Message;
 
     setMessages(prev => [...prev, tempUserMsg]);
 
@@ -113,7 +113,7 @@ export function useChat() {
         role: 'assistant',
         content: result.response,
         created_at: new Date().toISOString()
-      } as any;
+      } as Message;
       
       setMessages(prev => [...prev, aiMsg]);
       fetchConversations(); // Update sidebar labels

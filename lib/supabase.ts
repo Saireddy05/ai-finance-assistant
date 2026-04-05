@@ -1,5 +1,4 @@
 import { createBrowserClient } from '@supabase/ssr'
-import { Database } from '@/types/supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -14,15 +13,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
   }
 }
 
-let client: SupabaseClient<Database> | undefined;
+let client: SupabaseClient<any, "public", any> | undefined;
 
-export const createClient = () => {
+export const createClient = (): SupabaseClient<any, "public", any> => {
   if (typeof window === 'undefined') {
-    return createBrowserClient<Database>(supabaseUrl || '', supabaseAnonKey || '')
+    return createBrowserClient<any, "public">(supabaseUrl || '', supabaseAnonKey || '')
   }
 
   if (client) return client;
 
-  client = createBrowserClient<Database>(supabaseUrl || '', supabaseAnonKey || '');
+  client = createBrowserClient<any, "public">(supabaseUrl || '', supabaseAnonKey || '');
   return client;
 }

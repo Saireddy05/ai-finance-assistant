@@ -11,7 +11,7 @@ export function useSavingsGoals() {
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient() as any;
+  const supabase = createClient();
   const { user, loading: authLoading } = useAuth();
 
   const fetchGoals = async () => {
