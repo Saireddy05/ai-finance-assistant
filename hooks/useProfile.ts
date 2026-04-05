@@ -30,8 +30,16 @@ export function useProfile() {
         .eq('id', user.id)
         .single();
 
-      if (error) throw error;
-      setProfile(data);
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // Profile row doesn't exist yet, fallback to auth identity defaults
+          setProfile({ id: user.id, email: user.email } as any);
+        } else {
+          throw error;
+        }
+      } else {
+        setProfile(data);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -46,7 +54,7 @@ export function useProfile() {
 
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update({ email: user.email, ...updates })
         .eq('id', user.id);
 
       if (error) throw error;
@@ -59,7 +67,7 @@ export function useProfile() {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, [user]);
 
   return { profile, loading, error, updateProfile, refresh: fetchProfile };
 }

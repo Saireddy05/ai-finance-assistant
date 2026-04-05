@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { upsertProfile } from '@/app/actions/profile';
 
 type OnboardingData = {
   user_type: string;
@@ -60,29 +61,20 @@ export default function OnboardingPage() {
     }
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error } = await (supabase as any)
-        .from('profiles')
-        .update({
-          user_type: data.user_type,
-          income_range: data.income_range,
-          experience_level: data.experience_level,
-          financial_goals: data.financial_goals,
-          risk_level: data.risk_level,
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Supabase Onboarding Error:', error.message, error.details, error.hint);
-        throw new Error(error.message || 'Failed to save your profile. Please run the SQL schema update in Supabase.');
-      }
+      await upsertProfile(user.id, user?.email || '', {
+        user_type: data.user_type,
+        income_range: data.income_range,
+        experience_level: data.experience_level,
+        financial_goals: data.financial_goals,
+        risk_level: data.risk_level,
+        onboarding_completed: true,
+        updated_at: new Date().toISOString()
+      });
       
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Onboarding Error:', err.message || err);
-      alert(`Error: ${err.message || 'Please run the SQL schema update in your Supabase dashboard.'}`);
+      alert(`Error: ${err.message || 'Failed to save your profile.'}`);
     } finally {
       setLoading(false);
     }
