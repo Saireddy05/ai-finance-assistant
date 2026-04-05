@@ -6,7 +6,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { format } from 'date-fns';
 
 export default function NotificationPopover({ onClose }: { onClose: () => void }) {
-  const { notifications, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, markAsRead, markAllAsRead, clearAll } = useNotifications();
 
   const getIcon = (type: string, title: string) => {
     const lowerTitle = title.toLowerCase();
@@ -27,7 +27,7 @@ export default function NotificationPopover({ onClose }: { onClose: () => void }
       <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
         <div className="flex items-center gap-2">
           <Bell className="w-4 h-4 text-primary" />
-          <h3 className="font-bold text-sm">Notifications</h3>
+          <h3 className="font-bold text-sm text-white">Notifications</h3>
         </div>
         <div className="flex items-center gap-2">
           <button 
@@ -80,8 +80,11 @@ export default function NotificationPopover({ onClose }: { onClose: () => void }
 
       {notifications.length > 0 && (
         <div className="p-3 border-t border-zinc-800 bg-zinc-900/50 text-center">
-          <button className="text-[11px] font-bold text-zinc-500 hover:text-white transition-colors">
-            View All Notifications
+          <button 
+            onClick={clearAll}
+            className="text-[11px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest"
+          >
+            Clear All Notifications
           </button>
         </div>
       )}

@@ -8,7 +8,8 @@ import {
   User,
   LogOut,
   TrendingUp,
-  Gamepad2
+  BookOpen,
+  Newspaper
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase';
@@ -21,7 +22,8 @@ const navItems = [
   { name: 'Budgets', icon: Wallet, href: '/budgets' },
   { name: 'Analytics', icon: PieChart, href: '/analytics' },
   { name: 'AI Assistant', icon: MessageSquare, href: '/ai' },
-  { name: 'Learning', icon: Gamepad2, href: '/learning' },
+  { name: 'Learning', icon: BookOpen, href: '/learning' },
+  { name: 'Market News', icon: Newspaper, href: '/news' },
   { name: 'Profile', icon: User, href: '/profile' },
 ];
 

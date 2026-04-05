@@ -4,6 +4,7 @@ import AppLayout from '@/components/AppLayout';
 import { useProfile } from '@/hooks/useProfile';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useBudgets } from '@/hooks/useBudgets';
+import SmartRecommendations from '@/components/SmartRecommendations';
 import { 
   ArrowUpRight, 
   ArrowDownRight, 
@@ -13,7 +14,8 @@ import {
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { startOfMonth, endOfMonth, isWithinInterval, subDays, subMonths, format, eachDayOfInterval, eachMonthOfInterval } from 'date-fns';
 import { useAIInsights } from '@/hooks/useAIInsights';
 import { getCurrencySymbol } from '@/lib/currency';
@@ -34,8 +36,16 @@ export default function Dashboard() {
   const { transactions, loading: transactionsLoading } = useTransactions();
   const { budgets, loading: budgetsLoading } = useBudgets();
   const [period, setPeriod] = useState<Period>('30d');
+  const router = useRouter();
 
   const loading = profileLoading || transactionsLoading || budgetsLoading;
+
+  // Redirect to onboarding if user hasn't completed their financial profile
+  useEffect(() => {
+    if (!profileLoading && profile && !(profile as any).onboarding_completed) {
+      router.replace('/onboarding');
+    }
+  }, [profile, profileLoading, router]);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -113,6 +123,19 @@ export default function Dashboard() {
   const { insights: aiInsights, loading: insightsLoading } = useAIInsights();
   const symbol = getCurrencySymbol(profile?.currency || 'USD');
 
+  // Build a short transaction summary for the AI personalization engine
+  const transactionsSummary = useMemo(() => {
+    const now = new Date();
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
+    const monthly = transactions.filter(t => isWithinInterval(new Date(t.date), { start: monthStart, end: monthEnd }));
+    const expenses = monthly.filter(t => t.type === 'expense');
+    const totalExpense = expenses.reduce((sum, t) => sum + t.amount, 0);
+    const categories = expenses.reduce((acc: any, t) => { acc[t.category] = (acc[t.category] || 0) + t.amount; return acc; }, {});
+    const topCategory = Object.entries(categories).sort((a: any, b: any) => b[1] - a[1])[0];
+    return `Monthly expenses: ${symbol}${totalExpense.toFixed(0)}. Top category: ${topCategory ? `${topCategory[0]} (${symbol}${Number(topCategory[1]).toFixed(0)})` : 'N/A'}. Total transactions: ${expenses.length}.`;
+  }, [transactions, symbol]);
+
   return (
     <AppLayout>
       <div className="space-y-8">
@@ -143,6 +166,11 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+
+        {/* Smart Advisor — Personalized Recommendations */}
+        {profile && !loading && (
+          <SmartRecommendations profile={profile} transactionsSummary={transactionsSummary} />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Spending Trends Chart */}

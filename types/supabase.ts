@@ -16,6 +16,9 @@ export type Database = {
           full_name: string | null
           avatar_url: string | null
           currency: string
+          xp: number
+          level: number
+          streak: number
           updated_at: string
         }
         Insert: {
@@ -24,6 +27,9 @@ export type Database = {
           full_name?: string | null
           avatar_url?: string | null
           currency?: string
+          xp?: number
+          level?: number
+          streak?: number
           updated_at?: string
         }
         Update: {
@@ -32,6 +38,9 @@ export type Database = {
           full_name?: string | null
           avatar_url?: string | null
           currency?: string
+          xp?: number
+          level?: number
+          streak?: number
           updated_at?: string
         }
       }
@@ -98,6 +107,7 @@ export type Database = {
           message: string
           type: 'info' | 'warning' | 'success' | 'error'
           is_read: boolean
+          is_dismissed: boolean
           created_at: string
         }
         Insert: {
@@ -107,6 +117,7 @@ export type Database = {
           message: string
           type?: 'info' | 'warning' | 'success' | 'error'
           is_read?: boolean
+          is_dismissed?: boolean
           created_at?: string
         }
         Update: {
@@ -116,6 +127,62 @@ export type Database = {
           message?: string
           type?: 'info' | 'warning' | 'success' | 'error'
           is_read?: boolean
+          is_dismissed?: boolean
+          created_at?: string
+        }
+      }
+      notification_history: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          category: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          category?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          category?: string | null
+          created_at?: string
+        }
+      }
+      savings_goals: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          target_amount: number
+          current_amount: number
+          deadline: string | null
+          status: 'active' | 'completed' | 'cancelled'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          target_amount: number
+          current_amount?: number
+          deadline?: string | null
+          status?: 'active' | 'completed' | 'cancelled'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          target_amount?: number
+          current_amount?: number
+          deadline?: string | null
+          status?: 'active' | 'completed' | 'cancelled'
           created_at?: string
         }
       }
@@ -163,6 +230,26 @@ export type Database = {
           role?: 'user' | 'assistant'
           content?: string
           created_at?: string
+        }
+      },
+      user_lessons: {
+        Row: {
+          id: string
+          user_id: string
+          lesson_id: number
+          completed_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lesson_id: number
+          completed_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lesson_id?: number
+          completed_at?: string
         }
       }
     }

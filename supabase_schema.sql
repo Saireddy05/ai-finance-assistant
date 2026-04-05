@@ -40,10 +40,20 @@ CREATE TABLE public.notifications (
   message TEXT NOT NULL,
   type TEXT CHECK (type IN ('info', 'warning', 'success', 'error')) DEFAULT 'info' NOT NULL,
   is_read BOOLEAN DEFAULT false NOT NULL,
+  is_dismissed BOOLEAN DEFAULT false NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5.-- Conversations table
+-- 5. Notification History (For Deduplication)
+CREATE TABLE public.notification_history (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users NOT NULL,
+  title TEXT NOT NULL,
+  category TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. Conversations
 CREATE TABLE public.conversations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
@@ -51,13 +61,34 @@ CREATE TABLE public.conversations (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- AI Messages table
+-- AI Messages
 CREATE TABLE public.ai_messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   conversation_id UUID REFERENCES public.conversations ON DELETE CASCADE NOT NULL,
   role TEXT CHECK (role IN ('user', 'assistant')) NOT NULL,
   content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 6. Learning Progress
+CREATE TABLE public.user_lessons (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  lesson_id INTEGER NOT NULL,
+  completed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(user_id, lesson_id)
+);
+
+-- 7. Savings Goals
+CREATE TABLE public.savings_goals (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  target_amount DECIMAL(12,2) NOT NULL,
+  current_amount DECIMAL(12,2) DEFAULT 0 NOT NULL,
+  deadline DATE,
+  status TEXT CHECK (status IN ('active', 'completed', 'cancelled')) DEFAULT 'active' NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -68,6 +99,9 @@ ALTER TABLE public.budgets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_lessons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notification_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.savings_goals ENABLE ROW LEVEL SECURITY;
 
 -- Create Policies
 
@@ -84,11 +118,20 @@ CREATE POLICY "Users can manage own budgets" ON public.budgets FOR ALL USING (au
 -- Notifications
 CREATE POLICY "Users can manage own notifications" ON public.notifications FOR ALL USING (auth.uid() = user_id);
 
+-- Notification History
+CREATE POLICY "Users can manage own notification history" ON public.notification_history FOR ALL USING (auth.uid() = user_id);
+
+-- Savings Goals
+CREATE POLICY "Users can manage own savings_goals" ON public.savings_goals FOR ALL USING (auth.uid() = user_id);
+
 -- AI Conversations
 CREATE POLICY "Users can manage own conversations" ON public.conversations FOR ALL USING (auth.uid() = user_id);
 
 -- AI Messages
 CREATE POLICY "Users can manage own ai messages" ON public.ai_messages FOR ALL USING (auth.uid() = user_id);
+
+-- Learning Progress
+CREATE POLICY "Users can manage own user_lessons" ON public.user_lessons FOR ALL USING (auth.uid() = user_id);
 
 -- Trigger to create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -103,4 +146,3 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
- 
